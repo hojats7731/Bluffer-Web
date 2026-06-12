@@ -1,0 +1,9 @@
+services:
+  web:
+    build:
+      context: .
+      args:
+        VITE_WS_URL: ${VITE_WS_URL:-}
+    ports:
+      - "${WEB_PORT:-5173}:80"
+    restart: unless-stopped

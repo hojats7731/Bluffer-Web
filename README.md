@@ -12,12 +12,32 @@ cd ../Bluffer && docker compose up
 
 # Terminal 2 — Godot host (create room, get code)
 
-# Terminal 3 — web players
+# Terminal 3 — web players (Docker)
+cd ../Bluffer-Web && docker compose up --build
+```
+
+Open `http://<your-lan-ip>:5173` on phones (not `localhost`). WebSocket defaults to `ws://<same-hostname>:3000/ws` — no extra config if the server is on the same machine.
+
+### Development (hot reload)
+
+```bash
 npm install
 npm run dev
 ```
 
-Open `http://<your-lan-ip>:5173` on phones (not `localhost`). Set WebSocket URL to `ws://<your-lan-ip>:3000/ws`.
+### Docker
+
+```bash
+docker compose up --build
+```
+
+Serves the production build via nginx on port **5173** (override with `WEB_PORT` in `.env`).
+
+To bake in a fixed WebSocket URL at build time:
+
+```bash
+VITE_WS_URL=ws://192.168.1.10:3000/ws docker compose up --build
+```
 
 ## Player flow
 
