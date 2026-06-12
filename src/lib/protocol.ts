@@ -13,6 +13,7 @@ export interface PlayerSnapshot {
   name: string;
   connected: boolean;
   score?: number;
+  avatarId?: number;
 }
 
 export interface RoomState {
@@ -35,11 +36,19 @@ export interface VoteOption {
   text: string;
 }
 
+export interface RevealVoter {
+  playerId: string;
+  name: string;
+}
+
 export interface RevealEntry {
   optionId: string;
   text: string;
   authorId: string | null;
+  authorName?: string | null;
   fooledCount: number;
+  pointsEarned?: number;
+  voters?: RevealVoter[];
 }
 
 export interface ScoreRow {
@@ -53,10 +62,28 @@ export type ServerMessage =
   | { type: "player:session"; payload: { playerId: string; sessionToken: string } }
   | { type: "room:state"; payload: RoomState }
   | { type: "game:started"; payload: { totalRounds: number } }
-  | { type: "round:prompt"; payload: { round: number; promptId: string; text: string; submitDeadline: string } }
+  | {
+      type: "round:prompt";
+      payload: {
+        round: number;
+        promptId: string;
+        text: string;
+        submitDeadline: string;
+        roundKind?: "classic" | "about";
+        subjectPlayerId?: string;
+        subjectName?: string;
+      };
+    }
   | { type: "round:submit_ack"; payload: { accepted: true } }
   | { type: "round:vote_options"; payload: { options: VoteOption[] } }
-  | { type: "round:reveal"; payload: { truth: string; entries: RevealEntry[] } }
+  | {
+      type: "round:reveal";
+      payload: {
+        truth: string;
+        roundKind?: "classic" | "about";
+        entries: RevealEntry[];
+      };
+    }
   | { type: "round:scores"; payload: { roundScores: { playerId: string; points: number }[]; totals: ScoreRow[] } }
   | { type: "game:ended"; payload: { totals: ScoreRow[]; reason: string } }
   | { type: "room:closed"; payload: { roomId: string; reason: string } }

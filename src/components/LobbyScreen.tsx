@@ -1,4 +1,6 @@
 import type { RoomState } from "../lib/protocol";
+import { avatarEmoji } from "../lib/avatars";
+import { toPersianDigits } from "../lib/persianDigits";
 
 interface Props {
   room: RoomState;
@@ -21,13 +23,15 @@ export function LobbyScreen({ room, connected, onLeave }: Props) {
       <ul className="player-list">
         {room.players.map((p) => (
           <li key={p.id} className={p.connected ? "online" : "offline"}>
+            <span className="avatar">{avatarEmoji(p.avatarId, p.id)}</span>
             <span className="dot" />
             {p.name}
           </li>
         ))}
       </ul>
       <p className="hint">
-        {room.players.filter((p) => p.connected).length} / {room.maxPlayers} بازیکن
+        {toPersianDigits(room.players.filter((p) => p.connected).length)} /{" "}
+        {toPersianDigits(room.maxPlayers)} بازیکن
       </p>
       <button type="button" className="secondary" onClick={onLeave}>
         خروج

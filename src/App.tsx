@@ -52,6 +52,10 @@ export default function App() {
       <GameScreen
         room={game.room}
         promptText={game.promptText}
+        roundKind={game.roundKind}
+        subjectPlayerId={game.subjectPlayerId}
+        subjectName={game.subjectName}
+        playerId={game.playerId}
         voteOptions={game.voteOptions}
         hasSubmitted={game.hasSubmitted}
         hasVoted={game.hasVoted}

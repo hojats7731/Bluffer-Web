@@ -149,6 +149,10 @@ button.secondary:not(:disabled):hover {
   border-radius: 10px;
 }
 
+.player-list .avatar {
+  font-size: 1.25rem;
+}
+
 .player-list .dot {
   width: 10px;
   height: 10px;
@@ -210,6 +214,16 @@ button.secondary:not(:disabled):hover {
   color: var(--accent);
   font-weight: 600;
   margin: 0;
+}
+
+.about-badge {
+  text-align: center;
+  margin: 0;
+  padding: 0.5rem 1rem;
+  background: rgba(233, 69, 96, 0.2);
+  border-radius: 999px;
+  color: var(--accent);
+  font-weight: 600;
 }
 
 .prompt {

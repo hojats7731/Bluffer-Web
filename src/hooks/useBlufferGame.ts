@@ -24,6 +24,9 @@ export interface GameViewModel {
   room: RoomState | null;
   playerId: string | null;
   promptText: string;
+  roundKind: "classic" | "about";
+  subjectPlayerId: string | null;
+  subjectName: string;
   voteOptions: VoteOption[];
   hasSubmitted: boolean;
   hasVoted: boolean;
@@ -55,6 +58,9 @@ export function useBlufferGame(): GameViewModel {
   const [room, setRoom] = useState<RoomState | null>(null);
   const [playerId, setPlayerId] = useState<string | null>(null);
   const [promptText, setPromptText] = useState("");
+  const [roundKind, setRoundKind] = useState<"classic" | "about">("classic");
+  const [subjectPlayerId, setSubjectPlayerId] = useState<string | null>(null);
+  const [subjectName, setSubjectName] = useState("");
   const [voteOptions, setVoteOptions] = useState<VoteOption[]>([]);
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [hasVoted, setHasVoted] = useState(false);
@@ -108,6 +114,9 @@ export function useBlufferGame(): GameViewModel {
           break;
         case "round:prompt":
           setPromptText(message.payload.text);
+          setRoundKind(message.payload.roundKind ?? "classic");
+          setSubjectPlayerId(message.payload.subjectPlayerId ?? null);
+          setSubjectName(message.payload.subjectName ?? "");
           setHasSubmitted(false);
           setHasVoted(false);
           setVoteOptions([]);
@@ -148,15 +157,18 @@ export function useBlufferGame(): GameViewModel {
           socketRef.current.disconnect();
           setConnected(false);
           break;
-        case "server:error":
-          setError(`[${message.payload.code}] ${message.payload.message}`);
-          if (
-            message.payload.code === "RECONNECT_FAILED" ||
-            message.payload.code === "SESSION_EXPIRED"
-          ) {
+        case "server:error": {
+          const code = message.payload.code;
+          const msg =
+            code === "LIE_MATCHES_TRUTH"
+              ? "دروغ شما نمی‌تواند همان پاسخ درست باشد!"
+              : message.payload.message;
+          setError(`[${code}] ${msg}`);
+          if (code === "RECONNECT_FAILED" || code === "SESSION_EXPIRED") {
             clearSession();
           }
           break;
+        }
       }
     },
     [applyRoom],
@@ -242,6 +254,9 @@ export function useBlufferGame(): GameViewModel {
     room,
     playerId,
     promptText,
+    roundKind,
+    subjectPlayerId,
+    subjectName,
     voteOptions,
     hasSubmitted,
     hasVoted,

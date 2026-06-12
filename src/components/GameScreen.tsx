@@ -1,11 +1,16 @@
 import { useState, type FormEvent } from "react";
 import { MAX_LIE_LENGTH } from "../lib/protocol";
 import type { RoomState, VoteOption } from "../lib/protocol";
+import { toPersianDigits } from "../lib/persianDigits";
 import { Countdown } from "./Countdown";
 
 interface Props {
   room: RoomState;
   promptText: string;
+  roundKind: "classic" | "about";
+  subjectPlayerId: string | null;
+  subjectName: string;
+  playerId: string | null;
   voteOptions: VoteOption[];
   hasSubmitted: boolean;
   hasVoted: boolean;
@@ -16,17 +21,13 @@ interface Props {
   onCastVote: (optionId: string) => void;
 }
 
-const phaseLabels: Record<string, string> = {
-  prompt: "سؤال",
-  submit: "یک دروغ بنویسید",
-  vote: "رأی دهید",
-  reveal: "به صفحهٔ بزرگ نگاه کنید",
-  score: "امتیازها",
-};
-
 export function GameScreen({
   room,
   promptText,
+  roundKind,
+  subjectPlayerId,
+  subjectName,
+  playerId,
   voteOptions,
   hasSubmitted,
   hasVoted,
@@ -37,29 +38,58 @@ export function GameScreen({
   onCastVote,
 }: Props) {
   const [lie, setLie] = useState("");
+  const isAboutSubject =
+    roundKind === "about" && playerId !== null && playerId === subjectPlayerId;
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (lie.trim()) onSubmitLie(lie.trim());
   }
 
+  const phaseLabel =
+    room.phase === "submit" && roundKind === "about"
+      ? isAboutSubject
+        ? "دربارهٔ شما — پاسخ واقعی"
+        : "دربارهٔ بازیکن — دروغ بنویسید"
+      : room.phase === "submit"
+        ? "یک دروغ بنویسید"
+        : room.phase === "vote"
+          ? "رأی دهید"
+          : room.phase === "reveal"
+            ? "به صفحهٔ بزرگ نگاه کنید"
+            : room.phase === "score"
+              ? "امتیازها"
+              : "سؤال";
+
+  const submitLabel = isAboutSubject
+    ? "پاسخ واقعی خود را بنویسید"
+    : roundKind === "about"
+      ? `دروغی دربارهٔ ${subjectName} بنویسید`
+      : "دروغ باورپذیر خود را بنویسید";
+
+  const isAboutNonVoter =
+    roundKind === "about" && playerId !== null && playerId === subjectPlayerId;
+
   return (
     <div className="screen">
       <header className="game-header">
-        <span>{phaseLabels[room.phase] ?? room.phase}</span>
+        <span>{phaseLabel}</span>
         {room.round && room.totalRounds && (
           <span>
-            دور {room.round}/{room.totalRounds}
+            دور {toPersianDigits(room.round)}/{toPersianDigits(room.totalRounds)}
           </span>
         )}
       </header>
       <Countdown deadlineMs={deadlineMs} />
+      {roundKind === "about" && subjectName && !isAboutSubject && (
+        <p className="about-badge">دربارهٔ {subjectName}</p>
+      )}
       {promptText && <p className="prompt">{promptText}</p>}
 
       {room.phase === "submit" && !hasSubmitted && (
         <form onSubmit={handleSubmit} className="card">
           <label>
-            دروغ باورپذیر خود را بنویسید
+            {submitLabel}
             <textarea
               value={lie}
               onChange={(e) => setLie(e.target.value)}
@@ -69,7 +99,7 @@ export function GameScreen({
             />
           </label>
           <p className="char-count">
-            {lie.length}/{MAX_LIE_LENGTH}
+            {toPersianDigits(lie.length)}/{toPersianDigits(MAX_LIE_LENGTH)}
           </p>
           <button type="submit">ارسال</button>
         </form>
@@ -79,7 +109,11 @@ export function GameScreen({
         <p className="waiting">ارسال شد — منتظر بقیه بازیکنان...</p>
       )}
 
-      {room.phase === "vote" && !hasVoted && (
+      {room.phase === "vote" && isAboutNonVoter && (
+        <p className="waiting">شما موضوع این دور هستید — رأی نمی‌دهید</p>
+      )}
+
+      {room.phase === "vote" && !hasVoted && !isAboutNonVoter && (
         <div className="vote-list">
           {voteOptions.map((opt) => (
             <button
@@ -105,10 +139,12 @@ export function GameScreen({
       {room.phase === "score" && lastRoundPoints !== null && (
         <div className="card score-feedback">
           <p className="round-points">
-            این دور: <strong>+{lastRoundPoints}</strong>
+            این دور: <strong>+{toPersianDigits(lastRoundPoints)}</strong>
           </p>
           {totalScore !== null && (
-            <p className="total-score">مجموع شما: {totalScore}</p>
+            <p className="total-score">
+              مجموع شما: {toPersianDigits(totalScore)}
+            </p>
           )}
           <p className="waiting">جزئیات روی تلویزیون</p>
         </div>
