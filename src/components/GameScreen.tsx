@@ -10,6 +10,8 @@ interface Props {
   hasSubmitted: boolean;
   hasVoted: boolean;
   deadlineMs: number | null;
+  lastRoundPoints: number | null;
+  totalScore: number | null;
   onSubmitLie: (text: string) => void;
   onCastVote: (optionId: string) => void;
 }
@@ -29,6 +31,8 @@ export function GameScreen({
   hasSubmitted,
   hasVoted,
   deadlineMs,
+  lastRoundPoints,
+  totalScore,
   onSubmitLie,
   onCastVote,
 }: Props) {
@@ -94,10 +98,20 @@ export function GameScreen({
         <p className="waiting">رأی ثبت شد — منتظر بقیه...</p>
       )}
 
-      {(room.phase === "prompt" ||
-        room.phase === "reveal" ||
-        room.phase === "score") && (
+      {(room.phase === "prompt" || room.phase === "reveal") && (
         <p className="waiting">به صفحهٔ تلویزیون نگاه کنید</p>
+      )}
+
+      {room.phase === "score" && lastRoundPoints !== null && (
+        <div className="card score-feedback">
+          <p className="round-points">
+            این دور: <strong>+{lastRoundPoints}</strong>
+          </p>
+          {totalScore !== null && (
+            <p className="total-score">مجموع شما: {totalScore}</p>
+          )}
+          <p className="waiting">جزئیات روی تلویزیون</p>
+        </div>
       )}
     </div>
   );

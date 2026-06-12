@@ -32,6 +32,8 @@ export interface GameViewModel {
   closedReason: string;
   savedSession: PlayerSession | null;
   deadlineMs: number | null;
+  lastRoundPoints: number | null;
+  totalScore: number | null;
   join: (wsUrl: string, roomCode: string, name: string) => void;
   reconnect: () => void;
   submitLie: (text: string) => void;
@@ -44,6 +46,7 @@ export function useBlufferGame(): GameViewModel {
   const socketRef = useRef(new BlufferSocket());
   const pendingJoinRef = useRef<{ roomCode: string; name: string } | null>(null);
   const pendingReconnectRef = useRef<PlayerSession | null>(null);
+  const playerIdRef = useRef<string | null>(null);
 
   const [screen, setScreen] = useState<Screen>("join");
   const [connected, setConnected] = useState(false);
@@ -59,6 +62,8 @@ export function useBlufferGame(): GameViewModel {
   const [endReason, setEndReason] = useState("");
   const [closedReason, setClosedReason] = useState("");
   const [deadlineMs, setDeadlineMs] = useState<number | null>(null);
+  const [lastRoundPoints, setLastRoundPoints] = useState<number | null>(null);
+  const [totalScore, setTotalScore] = useState<number | null>(null);
   const [savedSession] = useState(() => loadSession());
 
   const applyRoom = useCallback((state: RoomState) => {
@@ -87,6 +92,7 @@ export function useBlufferGame(): GameViewModel {
           break;
         case "player:session": {
           setPlayerId(message.payload.playerId);
+          playerIdRef.current = message.payload.playerId;
           const existing = loadSession();
           if (!existing) break;
           saveSession({
@@ -105,9 +111,24 @@ export function useBlufferGame(): GameViewModel {
           setHasSubmitted(false);
           setHasVoted(false);
           setVoteOptions([]);
+          setLastRoundPoints(null);
           setDeadlineMs(Date.parse(message.payload.submitDeadline));
           setScreen("game");
           break;
+        case "round:scores": {
+          const pid = playerIdRef.current;
+          if (pid) {
+            const round = message.payload.roundScores.find(
+              (row) => row.playerId === pid,
+            );
+            setLastRoundPoints(round?.points ?? 0);
+            const total = message.payload.totals.find(
+              (row) => row.playerId === pid,
+            );
+            setTotalScore(total?.score ?? null);
+          }
+          break;
+        }
         case "round:submit_ack":
           setHasSubmitted(true);
           break;
@@ -229,6 +250,8 @@ export function useBlufferGame(): GameViewModel {
     closedReason,
     savedSession,
     deadlineMs,
+    lastRoundPoints,
+    totalScore,
     join,
     reconnect,
     submitLie,

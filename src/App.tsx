@@ -56,6 +56,8 @@ export default function App() {
         hasSubmitted={game.hasSubmitted}
         hasVoted={game.hasVoted}
         deadlineMs={game.deadlineMs}
+        lastRoundPoints={game.lastRoundPoints}
+        totalScore={game.totalScore}
         onSubmitLie={game.submitLie}
         onCastVote={game.castVote}
       />

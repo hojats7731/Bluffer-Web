@@ -270,3 +270,21 @@ button.secondary:not(:disabled):hover {
   font-weight: 700;
   color: var(--accent);
 }
+
+.score-feedback {
+  text-align: center;
+}
+
+.round-points {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.round-points strong {
+  color: var(--success);
+}
+
+.total-score {
+  margin: 0.5rem 0 0;
+  color: var(--muted);
+}
