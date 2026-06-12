@@ -72,8 +72,7 @@ export function useBlufferGame(): GameViewModel {
     }
   }, []);
 
-  const handleMessage = useCallback(
-    (message: ServerMessage) => {
+  const handleMessage = useCallback((message: ServerMessage) => {
       switch (message.type) {
         case "server:hello":
           if (pendingReconnectRef.current) {
@@ -89,11 +88,11 @@ export function useBlufferGame(): GameViewModel {
         case "player:session": {
           setPlayerId(message.payload.playerId);
           const existing = loadSession();
+          if (!existing) break;
           saveSession({
-            roomCode: existing?.roomCode ?? room?.roomCode ?? "",
+            ...existing,
             sessionToken: message.payload.sessionToken,
             playerId: message.payload.playerId,
-            name: existing?.name ?? "",
             wsUrl: socketRef.current.url,
           });
           break;
@@ -139,8 +138,11 @@ export function useBlufferGame(): GameViewModel {
           break;
       }
     },
-    [applyRoom, room?.roomCode],
+    [applyRoom],
   );
+
+  const handleMessageRef = useRef(handleMessage);
+  handleMessageRef.current = handleMessage;
 
   useEffect(() => {
     const socket = socketRef.current;
@@ -154,9 +156,8 @@ export function useBlufferGame(): GameViewModel {
       setConnecting(false);
     };
     socket.onError = () => setError("خطا در اتصال به سرور");
-    socket.onMessage = handleMessage;
-    return () => socket.disconnect();
-  }, [handleMessage]);
+    socket.onMessage = (message) => handleMessageRef.current(message);
+  }, []);
 
   const join = useCallback((wsUrl: string, roomCode: string, name: string) => {
     setError(null);

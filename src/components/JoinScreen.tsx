@@ -34,10 +34,14 @@ export function JoinScreen({
         <label>
           آدرس سرور
           <input
-            type="url"
+            type="text"
             value={wsUrl}
             onChange={(e) => setWsUrl(e.target.value)}
             dir="ltr"
+            inputMode="url"
+            autoCapitalize="off"
+            autoCorrect="off"
+            spellCheck={false}
             required
           />
         </label>
