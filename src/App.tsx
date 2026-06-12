@@ -38,7 +38,13 @@ export default function App() {
   }
 
   if (game.screen === "lobby" && game.room) {
-    return <LobbyScreen room={game.room} onLeave={game.leave} />;
+    return (
+      <LobbyScreen
+        room={game.room}
+        connected={game.connected}
+        onLeave={game.leave}
+      />
+    );
   }
 
   if (game.screen === "game" && game.room) {

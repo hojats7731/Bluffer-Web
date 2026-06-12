@@ -2,12 +2,17 @@ import type { RoomState } from "../lib/protocol";
 
 interface Props {
   room: RoomState;
+  connected: boolean;
   onLeave: () => void;
 }
 
-export function LobbyScreen({ room, onLeave }: Props) {
+export function LobbyScreen({ room, connected, onLeave }: Props) {
   return (
     <div className="screen">
+      <div className={`connection-banner ${connected ? "online" : "offline"}`}>
+        <span className="dot" />
+        {connected ? "متصل به سرور" : "اتصال قطع شد — در حال تلاش مجدد..."}
+      </div>
       <h1>لابی</h1>
       <p className="room-code-display" dir="ltr">
         {room.roomCode}

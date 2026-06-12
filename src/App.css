@@ -166,6 +166,38 @@ button.secondary:not(:disabled):hover {
   font-size: 0.9rem;
 }
 
+.preview-hint {
+  margin: 0;
+  text-align: center;
+}
+
+.connection-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 10px;
+  font-size: 0.85rem;
+}
+
+.connection-banner.online {
+  background: rgba(61, 220, 132, 0.12);
+  color: var(--success);
+}
+
+.connection-banner.offline {
+  background: rgba(255, 107, 107, 0.12);
+  color: var(--error);
+}
+
+.connection-banner .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
 .game-header {
   display: flex;
   justify-content: space-between;

@@ -16,7 +16,11 @@ cd ../Bluffer && docker compose up
 cd ../Bluffer-Web && docker compose up --build
 ```
 
-Open `http://<your-lan-ip>:5173` on phones (not `localhost`). WebSocket defaults to `ws://<same-hostname>:3000/ws` — no extra config if the server is on the same machine.
+Open `http://<your-lan-ip>:5173/?room=ABCD` on phones (scan QR on Godot lobby). WebSocket defaults to `ws://<same-hostname>:3000/ws`.
+
+Full-stack guide: [LOCAL_DEV.md](https://github.com/hojats7731/Bluffer/blob/main/docs/LOCAL_DEV.md) (server repo).
+
+Phase 3 roadmap: [docs/PHASE3_PLAN.md](docs/PHASE3_PLAN.md).
 
 ### Development (hot reload)
 
